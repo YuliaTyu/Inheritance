@@ -1,10 +1,10 @@
-#include<iostream>
+ï»¿#include<iostream>
 //using namespace std;
 using std::cin;
 using std::cout;
 using std::endl;
-#define HUMAN_TAKE_PARAMETERS const std::string& last_name, const std::string& first_name, int age//ÏĞÈÍÈÌÀÅÌÛÅ
-#define HUMAN_GIV_PARAMETERS last_name, first_name, age//ÏÅĞÅÄÀÂÀÅÌÛÅ
+#define HUMAN_TAKE_PARAMETERS const std::string& last_name, const std::string& first_name, int age//ĞŸĞ Ğ˜ĞĞ˜ĞœĞĞ•ĞœĞ«Ğ•
+#define HUMAN_GIV_PARAMETERS last_name, first_name, age//ĞŸĞ•Ğ Ğ•Ğ”ĞĞ’ĞĞ•ĞœĞ«Ğ•
 
 class Human
 {
@@ -63,8 +63,8 @@ class Student :public Human
 {
 	std::string speciality;
 	std::string group;
-	double rating;//óñïåâàåìîñòü
-	double attendance;//ïîñåùàåìîñòü
+	double rating;//ÑƒÑĞ¿ĞµĞ²Ğ°ĞµĞ¼Ğ¾ÑÑ‚ÑŒ
+	double attendance;//Ğ¿Ğ¾ÑĞµÑ‰Ğ°ĞµĞ¼Ğ¾ÑÑ‚ÑŒ
 public:
 	const std::string& get_speciality()const
 	{
