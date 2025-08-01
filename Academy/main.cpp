@@ -258,24 +258,24 @@ public:
 void Print(Human* group[], const int n)
 {
 	cout << typeid(group).name() << endl;//статический массив прилетает в функцию как обычный указатель 
+	cout << delimeter << endl;
 	//for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++) //4 байта/ 4 байта = получаем 1, а 1- это первая строка массива
 	for (int i = 0; i < n; i++) 
 	{
 		//group[i]->info();
 		cout << *group[i] << endl;
-		//cout << delimeter << endl;
+		cout << delimeter << endl;
 	}
 	cout << "Количество людей: " << group[0]->get_count() << endl;
 }
 
-void Save(Human** group, const int n, char filename[])
+void Save(Human** group, const int n, const char filename[])
 {
 	std::ofstream fout(filename);      //поток ОТКРЫЛИ!!!!!!!!
 	for (int i = 0; i < n; i++)
 	{
 		//group[i]->info();
 		fout << *group[i] << endl;      //в цикле происходит запись в файл
-		cout << delimeter << endl;
 	}
 	fout.close();                      // поток ЗАКРЫЛИ!!!!!!!!!
 	//вывод файла на экран по выводе консоли
@@ -294,6 +294,8 @@ void Clear(Human** group, const int n)
 
 //#define INHERITANCE
 //#define POLYMORPHISM
+//#define WRITE_TO_FILE
+
 
 void main()
 {
@@ -362,6 +364,8 @@ void main()
 
 #endif // POLYMORPHISM
 
+#ifdef WRITE_TO_FILE
+
 	Human* group[] =
 	{
 		//Приведение дочернего объекта к базовому типу называют Upcast
@@ -376,6 +380,11 @@ void main()
     };
 	cout << typeid(group).name() << endl;
 	Print(group, sizeof(group)/sizeof(group[0]));
-	Clear(group, sizeof(group) / sizeof(group[0]));
+	Save(group, sizeof(group)/sizeof(group[0]), "group.txt");
+	Clear(group, sizeof(group)/sizeof(group[0]));
+
+#endif // WRITE_TO_FILE
+
+
 
 }
