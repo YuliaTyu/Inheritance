@@ -11,7 +11,8 @@ using std::endl;
 
 class Human
 {
-	static const int LAST_NAME_WIDTH = 15;
+	static const int TYPE_WIDTH = 10;
+	static const int LAST_NAME_WIDTH = 18;
 	static const int FIRST_NAME_WIDTH = 15;
 	static const int AGE_WIDTH = 3;
 	static int count;		//static member declaration  считается количество объектов
@@ -65,13 +66,18 @@ public:
 	//Methods
 	virtual std::ostream& info(std::ostream& os)const
 	{
+		os.width(TYPE_WIDTH);
+		os << std::left;//первый вызов width() задает выравнивание по правому краю заданного поля, 
+		//и его нужно явно выровнять по левому краю.
+		os << std::string (typeid(*this).name() + 6) + ":";   //вывод в консоль КЛАССОВ +6 убираем из строки слово класс
+		//os << strchr(typeid(*this).name(), ' ')+1 << ":";   //вывод в консоль КЛАССОВ
 		//return os << last_name << " " << first_name << " " << age;
 
 		os.width(LAST_NAME_WIDTH);	//метод width(N) задает ширину вывода в 'N' знакопозиций,
 		//если выводимая строка меньше 'N', то недостающие символы заполняются пробелами,
 		//если выводимая строка больше 'N', она выводится полностью, и общее выравнивание нарушается
-		os << std::left;//первый вызов width() задает выравнивание по правому краю заданного поля, 
-		//и его нужно явно выровнять по левому краю.
+		//!!!!!!!!!!МЕТОД width(N) задает ширину ТОЛЬКО ДЛЯ ОДНОГО ВЫВОДИМОГО ЗНАЧЕНИЯ
+		//!!!!!!!!!!все последующие значения будут выводиться с минимальной шириной
 		os << last_name;
 		os.width(FIRST_NAME_WIDTH);
 		os << first_name;
