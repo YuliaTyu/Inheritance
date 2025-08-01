@@ -1,4 +1,6 @@
 ﻿#include<iostream>
+#include<fstream>
+#include<string>
 //using namespace std;
 using std::cin;
 using std::cout;
@@ -281,16 +283,32 @@ void main()
 		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
 		new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20),
 		new Graduate("Targarian", "Daineris", 22, "Flight", "GoT", 91, 92, "How to make smoke"),
-		new Teacher("Schwartzneger", "Arnold", 85, "Heavy Metal", 60)
+		new Teacher("Schwartzenegger", "Arnold", 85, "Heavy Metal", 60)
 	};
+
+	char filename[] = "group.txt";
+	std::ofstream fout(filename);      //поток ОТКРЫЛИ!!!!!!!!
 
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		//group[i]->info();
 		cout << *group[i] << endl;
+		fout << *group[i] << endl;      //в цикле происходит запись в файл
 		cout << delimeter << endl;
 	}
+	fout.close();                      // поток ЗАКРЫЛИ!!!!!!!!!
+	char cmd[FILENAME_MAX]= "notepad "; // в библиотеке 260 символов
+
+	//вывод файла на экран по выводе консоли
+	
+	//без создания переменной способ:
+	system((std::string("start notepad ") + filename).c_str());//в виде строковой 
+
+	//strcat(cmd, filename);
+	//system(cmd);                       
+
 	cout << "Количество людей: " << group[0]->get_count() << endl;
+
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
