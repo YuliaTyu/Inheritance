@@ -255,8 +255,45 @@ public:
 	}
 };
 
+void Print(Human* group[], const int n)
+{
+	cout << typeid(group).name() << endl;//статический массив прилетает в функцию как обычный указатель 
+	//for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++) //4 байта/ 4 байта = получаем 1, а 1- это первая строка массива
+	for (int i = 0; i < n; i++) 
+	{
+		//group[i]->info();
+		cout << *group[i] << endl;
+		//cout << delimeter << endl;
+	}
+	cout << "Количество людей: " << group[0]->get_count() << endl;
+}
+
+void Save(Human** group, const int n, char filename[])
+{
+	std::ofstream fout(filename);      //поток ОТКРЫЛИ!!!!!!!!
+	for (int i = 0; i < n; i++)
+	{
+		//group[i]->info();
+		fout << *group[i] << endl;      //в цикле происходит запись в файл
+		cout << delimeter << endl;
+	}
+	fout.close();                      // поток ЗАКРЫЛИ!!!!!!!!!
+	//вывод файла на экран по выводе консоли
+	//без создания переменной способ:
+	system((std::string("start notepad ") + filename).c_str());//в виде строковой 
+	char cmd[FILENAME_MAX] = "notepad "; // в библиотеке 260 символов
+}
+
+void Clear(Human** group, const int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		delete group[i];
+	}
+}
+
 //#define INHERITANCE
-#define POLYMORPHISM
+//#define POLYMORPHISM
 
 void main()
 {
@@ -303,12 +340,12 @@ void main()
 		cout << delimeter << endl;
 	}
 	fout.close();                      // поток ЗАКРЫЛИ!!!!!!!!!
-	char cmd[FILENAME_MAX]= "notepad "; // в библиотеке 260 символов
 
 	//вывод файла на экран по выводе консоли
 	
 	//без создания переменной способ:
 	system((std::string("start notepad ") + filename).c_str());//в виде строковой 
+	char cmd[FILENAME_MAX]= "notepad "; // в библиотеке 260 символов
 
 	//strcat(cmd, filename);
 	//system(cmd);                       
@@ -325,6 +362,20 @@ void main()
 
 #endif // POLYMORPHISM
 
-
+	Human* group[] =
+	{
+		//Приведение дочернего объекта к базовому типу называют Upcast
+		new Human("Montana", "Antonio", 25),
+		new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 99),
+		new Teacher("White", "Walter", 50, "Chemistry", 25),
+		new Graduate("Schreder", "Hank", 40, "Criminalistic", "WW_220", 40, 60, "How to catch Heisenberg"),
+		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
+		new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20),
+		new Graduate("Targarian", "Daineris", 22, "Flight", "GoT", 91, 92, "How to make smoke"),
+		new Teacher("Schwartzenegger", "Arnold", 85, "Heavy Metal", 60)
+    };
+	cout << typeid(group).name() << endl;
+	Print(group, sizeof(group)/sizeof(group[0]));
+	Clear(group, sizeof(group) / sizeof(group[0]));
 
 }
