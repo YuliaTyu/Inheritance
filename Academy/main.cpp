@@ -4,15 +4,23 @@ using std::cin;
 using std::cout;
 using std::endl;
 #define HUMAN_TAKE_PARAMETERS const std::string& last_name, const std::string& first_name, int age//ПРИНИМАЕМЫЕ
-#define HUMAN_GIV_PARAMETERS last_name, first_name, age//ПЕРЕДАВАЕМЫЕ
+#define HUMAN_GIVE_PARAMETERS last_name, first_name, age//ПЕРЕДАВАЕМЫЕ
 #define delimeter "\n-----------------------------------------------\n"
 
 class Human
 {
+	static const int LAST_NAME_WIDTH = 15;
+	static const int FIRST_NAME_WIDTH = 15;
+	static const int AGE_WIDTH = 3;
+	static int count;		//static member declaration  считается количество объектов
 	std::string last_name;
 	std::string first_name;
 	int age;
 public:
+	static int get_count()// для статической переменной написан метод
+	{
+		return count;
+	}
 	const std::string& get_last_name() const
 	{
 		return last_name;
@@ -44,24 +52,51 @@ public:
 		set_last_name(last_name);
 		set_first_name(first_name);
 		set_age(age);
+		count++;
 		cout << "HConsrtuctor\t" << this << endl;
 	}
 	virtual ~Human()
 	{
+		count--;
 		cout << "HDestructor\t" << this << endl;
 	}
 	//Methods
-	virtual void info()const
+	virtual std::ostream& info(std::ostream& os)const
 	{
-		cout << last_name << " " << first_name << " " << age << endl;
+		//return os << last_name << " " << first_name << " " << age;
+
+		os.width(LAST_NAME_WIDTH);	//метод width(N) задает ширину вывода в 'N' знакопозиций,
+		//если выводимая строка меньше 'N', то недостающие символы заполняются пробелами,
+		//если выводимая строка больше 'N', она выводится полностью, и общее выравнивание нарушается
+		os << std::left;//первый вызов width() задает выравнивание по правому краю заданного поля, 
+		//и его нужно явно выровнять по левому краю.
+		os << last_name;
+		os.width(FIRST_NAME_WIDTH);
+		os << first_name;
+		os.width(AGE_WIDTH);
+		os << age;
+		return os;
 	}
 };
 
+//static member definition:
+int Human::count = 0;	//Статические переменные можно инициализировать только за пределами класса.
+
+//перегрузка оператора << 
+std::ostream& operator<<(std::ostream& os, const Human& obj)
+{
+	return obj.info(os);
+	//return os << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age();
+}
+
 #define STUDENT_TAKE_PARAMETERS const std::string& speciality, const std::string& group, double rating, double attendance
-#define STUDENT_GIV_PARAMETERS  speciality, group, rating, attendance
+#define STUDENT_GIVE_PARAMETERS  speciality, group, rating, attendance
 
 class Student :public Human
 {
+	static const int SPECIALITY_WIDTH = 22;
+	static const int GROUP_WIDTH = 8;
+	static const int RATING_WIDTH = 5;
 	std::string speciality;
 	std::string group;
 	double rating;//успеваемость
@@ -104,7 +139,7 @@ public:
 	(
 		HUMAN_TAKE_PARAMETERS,
 		STUDENT_TAKE_PARAMETERS
-	):Human(HUMAN_GIV_PARAMETERS)
+	):Human(HUMAN_GIVE_PARAMETERS)
 	{
 		set_speciality(speciality);
 		set_group(group);
@@ -117,18 +152,31 @@ public:
 		cout << "SDestructor\t" << this << endl;
 	}
 	/////Metothods////
-	void info()const override
+	std::ostream& info(std::ostream& os)const override
 	{
-		Human::info();
-		cout << speciality << " " << group << " " << rating << " " << attendance << endl;
+		Human::info(os);
+		os.width(SPECIALITY_WIDTH);
+		os << speciality;
+		os.width(GROUP_WIDTH);
+		os << group;
+		os.width(RATING_WIDTH);
+		os << rating;
+		os.width(RATING_WIDTH);
+		os << attendance;
+		return os;
+
+		//Human::info(os) << " ";
+		//return os << speciality << " " << group << " " << rating << " " << attendance;
 	}
 };
 
 #define TEACHER_TAKE_PARAMETERS const std::string& speciality, int experience
-#define TEACHER_GIV_PARAMETERS speciality, experience
+#define TEACHER_GIVE_PARAMETERS speciality, experience
 
 class Teacher :public Human
 {
+	static const int SPECIALITY_WIDTH = 22;
+	static const int EXPERIENCE_WIDTH = 3;
 	std::string speciality;
 	int experience;
 public:
@@ -153,7 +201,7 @@ public:
 	(
 		HUMAN_TAKE_PARAMETERS,
 		TEACHER_TAKE_PARAMETERS
-	) :Human(HUMAN_GIV_PARAMETERS)
+	) :Human(HUMAN_GIVE_PARAMETERS)
 	{
 		set_speciality(speciality);
 		set_experience(experience);
@@ -164,10 +212,16 @@ public:
 		cout << "TDestructor\t" << this << endl;
 	}
 	/////Methods/////
-	void info()const override
+	std::ostream& info(std::ostream& os)const override
 	{
-		Human::info();
-		cout << speciality << " " << experience << endl;
+		Human::info(os);
+		os.width(SPECIALITY_WIDTH);
+		os << speciality;
+		os.width(EXPERIENCE_WIDTH);
+		os << experience;
+		return os;
+		//Human::info(os) << " ";
+		//return os << speciality << " " << experience;
 	}
 };
 
@@ -176,7 +230,7 @@ class Graduate :public Student
 	std::string subject;
 public:
 	Graduate(HUMAN_TAKE_PARAMETERS, STUDENT_TAKE_PARAMETERS, const std::string& subject)
-		:Student(HUMAN_GIV_PARAMETERS, STUDENT_GIV_PARAMETERS)
+		:Student(HUMAN_GIVE_PARAMETERS, STUDENT_GIVE_PARAMETERS)
 	{
 		this->subject = subject;
 		cout << "GConstructor\t" << this << endl;
@@ -185,10 +239,11 @@ public:
 	{
 		cout << "GDestructor\t" << this << endl;
 	}
-	void info()const override
+	
+	std::ostream& info(std::ostream& os)const override
 	{
-		Student::info();
-		cout << subject << endl;
+		Student::info(os) << " ";
+		return os << subject;
 	}
 };
 
@@ -214,22 +269,38 @@ void main()
 	graduate.info();
 #endif // INHERITANCE
 
+#ifdef POLYMORPHISM
+
 	Human* group[] =
 	{
+		//Приведение дочернего объекта к базовому типу называют Upcast
 		new Human("Montana", "Antonio", 25),
-	new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 99),
-	new Teacher("White", "Walter", 50, "Chemisrty", 25),
-	new Graduate("Schreder", "Hank", 40, "Criminalistic", "WW_220", 40, 60, "How to catch...."),
-	new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98,99),
-	new Teacher("Diaz", "Ric", 50, "Weapons distr",20)
+		new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 99),
+		new Teacher("White", "Walter", 50, "Chemistry", 25),
+		new Graduate("Schreder", "Hank", 40, "Criminalistic", "WW_220", 40, 60, "How to catch Heisenberg"),
+		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
+		new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20),
+		new Graduate("Targarian", "Daineris", 22, "Flight", "GoT", 91, 92, "How to make smoke"),
+		new Teacher("Schwartzneger", "Arnold", 85, "Heavy Metal", 60)
 	};
+
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
-		group[i]->info();
+		//group[i]->info();
+		cout << *group[i] << endl;
 		cout << delimeter << endl;
 	}
+	cout << "Количество людей: " << group[0]->get_count() << endl;
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
 	}
+	cout << "Количество людей: " << group[0]->get_count() << endl; //вызов через сущестующий объект для класс
+	//cout << "Количество людей: " << Human::get_count() << endl;  // вызов для класса
+	
+
+#endif // POLYMORPHISM
+
+
+
 }
