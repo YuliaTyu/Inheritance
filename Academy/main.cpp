@@ -85,6 +85,12 @@ public:
 		os << age;
 		return os;
 	}
+
+	//метод для чтения из файла
+	virtual std::istream& scan(std::istream& is)//принимает поток и изменяет наш файл - метод не const
+	{
+		return is >> last_name >> first_name >> age;//возвращает измененный поток
+	}
 };
 
 //static member definition:
@@ -95,6 +101,12 @@ std::ostream& operator<<(std::ostream& os, const Human& obj)
 {
 	return obj.info(os);
 	//return os << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age();
+}
+
+//перегрузка оператора >> для чтения из файла
+std::istream& operator>>(std::istream& is, Human& obj)
+{
+	return obj.scan(is);//вызовем поток 
 }
 
 #define STUDENT_TAKE_PARAMETERS const std::string& speciality, const std::string& group, double rating, double attendance
@@ -176,6 +188,11 @@ public:
 		//Human::info(os) << " ";
 		//return os << speciality << " " << group << " " << rating << " " << attendance;
 	}
+	//метод для чтения из файла
+	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
+	{
+		return Human::scan(is) >> (speciality) >> group >> rating >> attendance;
+	}
 };
 
 #define TEACHER_TAKE_PARAMETERS const std::string& speciality, int experience
@@ -231,6 +248,11 @@ public:
 		//Human::info(os) << " ";
 		//return os << speciality << " " << experience;
 	}
+	//метод для чтения из файла
+	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
+	{
+		return Human::scan(is) >> speciality >> experience;
+	}
 };
 
 class Graduate :public Student
@@ -247,11 +269,16 @@ public:
 	{
 		cout << "GDestructor\t" << this << endl;
 	}
-	
+	//методы:
 	std::ostream& info(std::ostream& os)const override
 	{
 		Student::info(os) << " ";
 		return os << subject;
+	}
+	//метод для чтения из файла
+	std::istream& scan(std::istream& is)
+	{
+		return std::getline(Student::scan(is),subject);
 	}
 };
 
@@ -283,7 +310,55 @@ void Save(Human** group, const int n, const char filename[])
 	system((std::string("start notepad ") + filename).c_str());//в виде строковой 
 	char cmd[FILENAME_MAX] = "notepad "; // в библиотеке 260 символов
 }
+//фабрика объектов Factory(для чтения из файла)
+Human* HumanFactory(std::string& type)
+{
+	Human* human = nullptr;//указатель на Human 
+	//if (type[0] == '\n')type = type.c_str() + 1;
+	
+	if (strstr(type.c_str(),"Human"))human = new Human("", "", 0);
+	if (strstr(type.c_str(),"Student"))human = new Student("", "", 0, "", "", 0, 0);
+	if (strstr(type.c_str(),"Graduate"))human = new Graduate("", "", 0, "", "", 0, 0,"");
+	if (strstr(type.c_str(),"Teacher"))human = new Teacher("", "", 0, "", 0);
+	return human;
+}
+//функция для чтения из файла
+Human** Load(const char filename[])
+{
+	int n = 0;//количество объектов, хранящихся в файле
+	Human** group = nullptr;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+	//1 Посчитать количество объектов в файле, для того чтобы выделить память
+		std::string buffer;
+		while(!fin.eof())//eof() - значение минус один - находимся в конце файла
+		{
+			std::getline(fin, buffer);
+			if (buffer.size() == 0)continue;// continue - прерывает текущую итерацию и переходит к следующей
+			n++;
+		}
+		cout << "File position: " << fin.tellg() << endl;
+		cout << "количество объектов" << n << endl;
+	//2 выделяем память под массив обектов
+		group = new Human*[n] {};
+    //3 Возвращаемся в начало файла, для того что бы считать объекты
+		fin.clear();
+		fin.seekg(0);
+		cout << "File position:" << fin.tellg() << endl;
+	//4 Считываем объекты из файла
+		for (int i = 0; i < n; i++)
+		{
+			std::getline(fin, buffer,':');
+			cout << buffer << endl;
 
+			group[i] = HumanFactory(buffer);//создаем объект
+			fin >> *group[i];
+		}
+	}
+	fin.close();
+	return group;
+}
 void Clear(Human** group, const int n)
 {
 	for (int i = 0; i < n; i++)
@@ -385,6 +460,8 @@ void main()
 
 #endif // WRITE_TO_FILE
 
-
+	Human** group = Load("group.txt");
+	//cout << "\n-------------------------\n";
+	Print(group, 8);
 
 }
