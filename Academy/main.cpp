@@ -251,7 +251,9 @@ public:
 	//метод для чтения из файла
 	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
 	{
-		return Human::scan(is) >> speciality >> experience;
+		Human::scan(is);
+		//>> speciality;
+		is>> experience;
 	}
 };
 
