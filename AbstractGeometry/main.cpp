@@ -3,11 +3,11 @@ using namespace std;
 
 enum Color
 {
-	Red     = 0x000000FF,
-	Green   = 0x0000FF00,
-	Blue    = 0x00FF0000,
-	Yellow  = 0x0000FFFF,
-	Violet  = 0x00FF00FF
+	Red = 0x000000FF,
+	Green = 0x0000FF00,
+	Blue = 0x00FF0000,
+	Yellow = 0x0000FFFF,
+	Violet = 0x00FF00FF
 };
 
 class Shape
@@ -26,7 +26,7 @@ public:
 	virtual double get_area()const = 0;
 	virtual double get_perimeter()const = 0;
 	virtual void draw()const = 0;
-	Shape(Color color): color(color){}
+	Shape(Color color) : color(color) {}
 	virtual void info()const
 	{
 		cout << " Площадь фигуры" << get_area() << endl;
@@ -78,6 +78,54 @@ public:
 	}
 };
 
+class Rectangle : public Shape
+{
+	double side_1;
+	double side_2;
+public:
+	void set_side_1(double side_1)
+	{
+		this->side_1 = side_1;
+	}
+	void set_side_2(double side_2)
+	{
+		this->side_2 = side_2;
+	}
+
+	double get_side_1()const
+	{
+		return side_1;
+	}
+	double get_side_2() const
+	{
+		return side_2;
+	}
+	double get_area() const override
+	{
+		return side_1 * side_2;
+	}
+	double get_perimeter() const override
+	{
+		return (side_1 + side_2) * 2;
+	}
+	void draw()const override
+	{
+		cout << "Прямоугольник " << endl;
+	}
+	Rectangle(double side_1, double side_2, Color color) : Shape(color)
+	{
+		set_side_1(side_1);
+		set_side_2(side_2);
+	}
+	void info()const override
+	{
+		cout << typeid(*this).name() << endl;
+		cout << "1 " << get_side_1() << endl;
+		cout << "2 " << get_side_2() << endl;
+		Shape::info();
+	}
+};
+
 
 void main()
 {
@@ -85,4 +133,8 @@ void main()
 	//Shape shape(Color :: Blue);
 	Square square(5, Color::Red);
 	square.info();
+
+	Rectangle rectangle(20, 15, Color::Red);
+	rectangle.info();
+
 }
