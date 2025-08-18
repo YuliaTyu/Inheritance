@@ -373,8 +373,8 @@ void Clear(Human** group, const int n)
 }
 
 //#define INHERITANCE
-#define POLYMORPHISM
-//#define WRITE_TO_FILE
+//#define POLYMORPHISM
+#define WRITE_TO_FILE
 
 
 void main()
