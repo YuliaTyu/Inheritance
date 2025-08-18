@@ -332,7 +332,7 @@ Human** Load(const char filename[])
 {
 	int n = 0;//количество объектов, хранящихся в файле
 	Human** group = nullptr;
-	std::ifstream fin(filename);
+	std::ifstream fin(filename);//открываем файл
 	if (fin.is_open())
 	{
 	//1 Посчитать количество объектов в файле, для того чтобы выделить память
@@ -345,13 +345,16 @@ Human** Load(const char filename[])
 		}
 		cout << "File position: " << fin.tellg() << endl;
 		cout << "количество объектов" << n << endl;
+
 	//2 выделяем память под массив обектов
 		group = new Human*[n] {};
+
     //3 Возвращаемся в начало файла, для того что бы считать объекты
-		fin.clear();
-		fin.seekg(0);
-		cout << "File position:" << fin.tellg() << endl;
-	//4 Считываем объекты из файла
+		fin.clear(); //очищает поток
+		fin.seekg(0);//метод переводит get курсор на чтение в позицию указанную которая n
+		cout << "File position:" << fin.tellg() << endl;//метод возвращает текущую get позицию курсора на чтение-1eof(end of fail)
+	
+		//4 Считываем объекты из файла
 		for (int i = 0; i < n; i++)
 		{
 			std::getline(fin, buffer,':');
@@ -361,9 +364,10 @@ Human** Load(const char filename[])
 			fin >> *group[i];
 		}
 	}
-	fin.close();
+	fin.close();// закрываем файл
 	return group;
 }
+
 void Clear(Human** group, const int n)
 {
 	for (int i = 0; i < n; i++)
@@ -374,7 +378,7 @@ void Clear(Human** group, const int n)
 
 //#define INHERITANCE
 //#define POLYMORPHISM
-#define WRITE_TO_FILE
+//#define WRITE_TO_FILE
 
 
 void main()
@@ -465,8 +469,9 @@ void main()
 
 #endif // WRITE_TO_FILE
 
-	//Human** group = Load("group.txt");
+	int n = 0;
+	Human** group = Load("group.txt", n);
 	//cout << "\n-------------------------\n";
-	//Print(group, 8);
-
+	Print(group, n);
+	Clear(group, n);
 }
