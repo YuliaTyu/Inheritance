@@ -11,11 +11,11 @@ using std::endl;
 
 class Human
 {
-	static const int TYPE_WIDTH = 10;
-	static const int LAST_NAME_WIDTH = 18;
+	static const int TYPE_WIDTH = 12;
+	static const int LAST_NAME_WIDTH = 20;
 	static const int FIRST_NAME_WIDTH = 15;
 	static const int AGE_WIDTH = 3;
-	static int count;		//static member declaration  считается количество объектов
+	static int count;		//объявление статической переменной //static member declaration  считается количество объектов
 	std::string last_name;
 	std::string first_name;
 	int age;
@@ -73,11 +73,12 @@ public:
 		//os << strchr(typeid(*this).name(), ' ')+1 << ":";   //вывод в консоль КЛАССОВ
 		//return os << last_name << " " << first_name << " " << age;
 
-		os.width(LAST_NAME_WIDTH);	//метод width(N) задает ширину вывода в 'N' знакопозиций,
+		//os.width(LAST_NAME_WIDTH);	//метод width(N) задает ширину вывода в 'N' знакопозиций,
 		//если выводимая строка меньше 'N', то недостающие символы заполняются пробелами,
 		//если выводимая строка больше 'N', она выводится полностью, и общее выравнивание нарушается
 		//!!!!!!!!!!МЕТОД width(N) задает ширину ТОЛЬКО ДЛЯ ОДНОГО ВЫВОДИМОГО ЗНАЧЕНИЯ
 		//!!!!!!!!!!все последующие значения будут выводиться с минимальной шириной
+		os.width(LAST_NAME_WIDTH);
 		os << last_name;
 		os.width(FIRST_NAME_WIDTH);
 		os << first_name;
@@ -94,7 +95,7 @@ public:
 };
 
 //static member definition:
-int Human::count = 0;	//Статические переменные можно инициализировать только за пределами класса.
+int Human::count = 0;	//Статические переменные можно инициализировать только за пределами класса.(относится к определению класса)
 
 //перегрузка оператора << 
 std::ostream& operator<<(std::ostream& os, const Human& obj)
@@ -119,7 +120,7 @@ class Student :public Human
 	static const int RATING_WIDTH = 5;
 	std::string speciality;
 	std::string group;
-	double rating;//успеваемость
+	double rating;    //успеваемость
 	double attendance;//посещаемость
 public:
 	const std::string& get_speciality()const
@@ -254,6 +255,7 @@ public:
 		Human::scan(is);
 		//>> speciality;
 		is>> experience;
+		return is;
 	}
 };
 
@@ -312,6 +314,7 @@ void Save(Human** group, const int n, const char filename[])
 	system((std::string("start notepad ") + filename).c_str());//в виде строковой 
 	char cmd[FILENAME_MAX] = "notepad "; // в библиотеке 260 символов
 }
+
 //фабрика объектов Factory(для чтения из файла)
 Human* HumanFactory(std::string& type)
 {
@@ -370,7 +373,7 @@ void Clear(Human** group, const int n)
 }
 
 //#define INHERITANCE
-//#define POLYMORPHISM
+#define POLYMORPHISM
 //#define WRITE_TO_FILE
 
 
@@ -462,8 +465,8 @@ void main()
 
 #endif // WRITE_TO_FILE
 
-	Human** group = Load("group.txt");
+	//Human** group = Load("group.txt");
 	//cout << "\n-------------------------\n";
-	Print(group, 8);
+	//Print(group, 8);
 
 }
