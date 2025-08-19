@@ -1,6 +1,8 @@
 ﻿#include<iostream>
 #include<fstream>
 #include<string>
+#include<sstream>
+#include<Windows.h>
 //using namespace std;
 using std::cin;
 using std::cout;
@@ -252,9 +254,15 @@ public:
 	//метод для чтения из файла
 	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
 	{
+		char* buffer = new char[SPECIALITY_WIDTH+1] {};
 		Human::scan(is);
-		//>> speciality;
+		is.read(buffer, SPECIALITY_WIDTH);
+		while (buffer[0] == ' ')for (int i = 0; buffer[i]; i++)buffer[i] = buffer[i + 1];
+		for (char* pch = strrchr(buffer, ' '); *pch = ' '; pch--)*pch = 0;
+		//buffer[SPECIALITY_WIDTH - 1] = 0;
+		speciality = buffer;// +1;
 		is>> experience;
+		delete[] buffer;
 		return is;
 	}
 };
@@ -303,11 +311,13 @@ void Print(Human* group[], const int n)
 void Save(Human** group, const int n, const char filename[])
 {
 	std::ofstream fout(filename);      //поток ОТКРЫЛИ!!!!!!!!
+	SetConsoleCP(1251);
 	for (int i = 0; i < n; i++)
 	{
 		//group[i]->info();
 		fout << *group[i] << endl;      //в цикле происходит запись в файл
 	}
+	SetConsoleCP(866);
 	fout.close();                      // поток ЗАКРЫЛИ!!!!!!!!!
 	//вывод файла на экран по выводе консоли
 	//без создания переменной способ:
@@ -379,7 +389,7 @@ void Clear(Human** group, const int n)
 //#define INHERITANCE
 //#define POLYMORPHISM
 //#define WRITE_TO_FILE
-
+#define LOAD_TO_FIFE
 
 void main()
 {
@@ -469,9 +479,13 @@ void main()
 
 #endif // WRITE_TO_FILE
 
-	int n = 0;
-	Human** group = Load("group.txt", n);
-	//cout << "\n-------------------------\n";
-	Print(group, n);
-	Clear(group, n);
+#ifdef LOAD_TO_FIFE
+
+	Human** group = Load("group.txt");
+	Print(group, 8);
+	Clear(group, 8);
+
+#endif // LOAD_TO_FIFE
+
+
 }
