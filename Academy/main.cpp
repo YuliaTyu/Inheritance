@@ -191,10 +191,23 @@ public:
 		//Human::info(os) << " ";
 		//return os << speciality << " " << group << " " << rating << " " << attendance;
 	}
+
 	//метод для чтения из файла
 	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
 	{
-		return Human::scan(is) >> (speciality) >> group >> rating >> attendance;
+		Human::scan(is); 
+		char sz_buffer[SPECIALITY_WIDTH + 1] = {};
+		is.read(sz_buffer, SPECIALITY_WIDTH);//чиает заданное кол-во символов из файла
+		//Удаляем лишние пробелы в конце прочитанной строки
+		for (int i = SPECIALITY_WIDTH-1; sz_buffer[i] == ' '; i--)sz_buffer[i] = 0;
+		//удаляем лишние пробелы в начале прочитанной строки
+		while (sz_buffer[0] == ' ')
+			for (int i = 0; sz_buffer[i]; i++)sz_buffer[i] = sz_buffer[i + 1];
+
+		speciality = sz_buffer;
+
+		is >> group >> rating >> attendance;
+		return is;
 	}
 };
 
@@ -251,8 +264,9 @@ public:
 		//Human::info(os) << " ";
 		//return os << speciality << " " << experience;
 	}
+
 	//метод для чтения из файла
-	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
+	/*std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
 	{
 		char* buffer = new char[SPECIALITY_WIDTH+1] {};
 		Human::scan(is);
@@ -263,6 +277,22 @@ public:
 		speciality = buffer;// +1;
 		is>> experience;
 		delete[] buffer;
+		return is;
+	}*/
+	std::istream& scan(std::istream& is)override//так как базовый метод виртуальный
+	{
+		Human::scan(is);
+		char sz_buffer[SPECIALITY_WIDTH + 1] = {};
+		is.read(sz_buffer, SPECIALITY_WIDTH);//чиает заданное кол-во символов из файла
+		//Удаляем лишние пробелы в конце прочитанной строки
+		for (int i = SPECIALITY_WIDTH-1; sz_buffer[i] == ' '; i--)sz_buffer[i] = 0;
+		//удаляем лишние пробелы в начале прочитанной строки
+		while (sz_buffer[0] == ' ')
+			for (int i = 0; sz_buffer[i]; i++)sz_buffer[i] = sz_buffer[i + 1];
+
+		speciality = sz_buffer;
+
+		is >> experience;
 		return is;
 	}
 };
@@ -287,10 +317,14 @@ public:
 		Student::info(os) << " ";
 		return os << subject;
 	}
+
 	//метод для чтения из файла
-	std::istream& scan(std::istream& is)
+	
+	std::istream& scan(std::istream& is)override
 	{
-		return std::getline(Student::scan(is),subject);
+		Student::scan(is);
+		std::getline(is, subject);
+		return is;
 	}
 };
 
@@ -326,21 +360,21 @@ void Save(Human** group, const int n, const char filename[])
 }
 
 //фабрика объектов Factory(для чтения из файла)
-Human* HumanFactory(std::string& type)
+Human* HumanFactory(const std::string& type)
 {
 	Human* human = nullptr;//указатель на Human 
 	//if (type[0] == '\n')type = type.c_str() + 1;
 	
 	if (strstr(type.c_str(),"Human"))human = new Human("", "", 0);
-	if (strstr(type.c_str(),"Student"))human = new Student("", "", 0, "", "", 0, 0);
-	if (strstr(type.c_str(),"Graduate"))human = new Graduate("", "", 0, "", "", 0, 0,"");
-	if (strstr(type.c_str(),"Teacher"))human = new Teacher("", "", 0, "", 0);
+	else if (strstr(type.c_str(),"Student"))human = new Student("", "", 0, "", "", 0, 0);
+	else if (strstr(type.c_str(),"Graduate"))human = new Graduate("", "", 0, "", "", 0, 0,"");
+	else if (strstr(type.c_str(),"Teacher"))human = new Teacher("", "", 0, "", 0);
 	return human;
 }
 //функция для чтения из файла
-Human** Load(const char filename[])
+Human** Load(const std::string& filename, int& n)
 {
-	int n = 0;//количество объектов, хранящихся в файле
+	n = 0;//количество объектов, хранящихся в файле
 	Human** group = nullptr;
 	std::ifstream fin(filename);//открываем файл
 	if (fin.is_open())
@@ -365,14 +399,20 @@ Human** Load(const char filename[])
 		cout << "File position:" << fin.tellg() << endl;//метод возвращает текущую get позицию курсора на чтение-1eof(end of fail)
 	
 		//4 Считываем объекты из файла
-		for (int i = 0; i < n; i++)
+		for (int i = 0; !fin.eof();)
 		{
+			std::string buffer;
 			std::getline(fin, buffer,':');
-			cout << buffer << endl;
-
-			group[i] = HumanFactory(buffer);//создаем объект
+			//cout << buffer << endl;
+			if (buffer.size() < 5)continue;
+			group[i] = HumanFactory(buffer);   //создаем объект
 			fin >> *group[i];
+			i++;
 		}
+	}
+	else
+	{
+		std::cerr << "Error" << endl;
 	}
 	fin.close();// закрываем файл
 	return group;
@@ -481,9 +521,10 @@ void main()
 
 #ifdef LOAD_TO_FIFE
 
-	Human** group = Load("group.txt");
-	Print(group, 8);
-	Clear(group, 8);
+	int n = 0;
+	Human** group = Load("group.txt", n);
+	Print(group,n);
+	Clear(group, n);
 
 #endif // LOAD_TO_FIFE
 
