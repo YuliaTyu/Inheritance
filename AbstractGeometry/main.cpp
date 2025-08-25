@@ -1,8 +1,8 @@
 ﻿#include<iostream>
-#include<Windows.h>
+#include<Windows.h> //библиотека для создания рисования чем и на чем
 using namespace std;
 
-namespace Geometry
+namespace Geometry//так как существует функция Rectangle в библиотке Windows.h , создаем доп пространство имен 
 {
 
 	enum Color//пользовательский тип данных
@@ -60,15 +60,15 @@ namespace Geometry
 		{
 			this->color = color;
 		}
-		double get_start_x()const
+		int get_start_x()const
 		{
 			return start_x;
 		}
-		double get_start_y()const
+		int get_start_y()const
 		{
 			return start_y;
 		}
-		double get_line_width()const
+		int get_line_width()const
 		{
 			return line_width;
 		}
@@ -234,10 +234,10 @@ void main()
 {
 	setlocale(LC_ALL, "");
 	//Shape shape(Color :: Blue);//нельзя создать экземпляр абстр класса
-	Geometry:: Square square(50,400,100,5, Geometry:: Color::Red);
+	Geometry:: Square square(50,400,100,5, Geometry:: Color::Yellow);
 	square.info();
 
-	Geometry:: Rectangle rectangle(200,150,550,100,1, Geometry:: Color::Blue);
+	Geometry:: Rectangle rectangle(200,150,550,100,1, Geometry:: Color::Violet);
 	rectangle.info();
 
 }
