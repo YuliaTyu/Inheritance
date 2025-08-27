@@ -1,4 +1,5 @@
-﻿#include<iostream>
+﻿#define _USE_MATH_DEFINES //использование функции Пи
+#include<iostream>
 #include<Windows.h> //библиотека для создания рисования чем и на чем
 using namespace std;
 
@@ -26,7 +27,8 @@ namespace Geometry//так как существует функция Rectangle 
 		static const int MIN_LINE_WIDTH = 1;
 		static const int MAX_LINE_WIDTH = 32;
 		static const int MIN_SIZE = 32;
-		static const int MAX_SIZE = 800;
+		static const int MAX_SIZE = 512;
+
 	protected:
 		int start_x;
 		int start_y;
@@ -55,6 +57,13 @@ namespace Geometry//так как существует функция Rectangle 
 				line_width > MAX_LINE_WIDTH ? MAX_LINE_WIDTH :
 				line_width;
 		}
+	     int filter_size(int size)const
+		{
+			 return
+				 size <MIN_SIZE ? MIN_SIZE :
+				 size > MAX_SIZE ? MAX_SIZE :
+				 size;
+		}
 
 		void set_color(Color color)
 		{
@@ -80,7 +89,8 @@ namespace Geometry//так как существует функция Rectangle 
 
 		virtual double get_area()const = 0;      //Ч-В 
 		virtual double get_perimeter()const = 0; //Ч-В 
-		virtual void draw()const = 0;            //Ч-В 
+		virtual void draw()const = 0;            //Ч-В - РИСУЕМ !!!!!!!!!
+
 		Shape(SHAPE_TAKE_PARAMETERS) : color(color)
 		{
 			set_start_x(start_x);
@@ -144,11 +154,11 @@ namespace Geometry//так как существует функция Rectangle 
 	public:
 		void set_side_1(double side_1)
 		{
-			this->side_1 = side_1;
+			this->side_1 = filter_size(side_1);
 		}
 		void set_side_2(double side_2)
 		{
-			this->side_2 = side_2;
+			this->side_2 = filter_size (side_2);
 		}
 
 		double get_side_1()const
@@ -227,7 +237,116 @@ namespace Geometry//так как существует функция Rectangle 
 	public:
 		Square(double side, SHAPE_TAKE_PARAMETERS) :Rectangle(side, side, SHAPE_GIVE_PARAMETERS) {}
 	};
+
+
+	class Circle:public Shape
+	{
+		double radius;
+	public:
+		Circle(double radius, SHAPE_TAKE_PARAMETERS) : Shape(SHAPE_GIVE_PARAMETERS)
+		{
+			set_radius(radius);
+		}
+		
+		void set_radius(double radius)
+		{
+			this->radius = filter_size(radius);
+		}
+		double get_radius()const
+		{
+			return radius;
+		}
+		double get_diameter()const
+		{
+			return 2 * radius;
+		}
+		double get_area()const override
+		{
+			return M_PI * radius * radius;
+		}
+		double get_perimeter()const override
+		{
+			return M_PI * get_diameter();
+		}
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			::Ellipse(hdc, start_x, start_y, start_x + get_diameter(), start_y + get_diameter());
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			ReleaseDC(hwnd, hdc);
+
+		}
+
+	};
+
+	class Triangle : public Shape
+	{
+	public:
+		Triangle(SHAPE_TAKE_PARAMETERS): Shape(SHAPE_GIVE_PARAMETERS){}
+		virtual double get_height()const = 0;
+	};
+
+	class EquilateralTriangle :public Triangle
+	{
+		double side;
+	public:
+		EquilateralTriangle(double side, SHAPE_TAKE_PARAMETERS) : Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_side(side);
+		}
+		void set_side(double side)
+		{
+			this->side = filter_size(side);
+		}
+		double get_side()const
+		{
+			return side;
+		}
+		double get_height()const override
+		{
+			return sqrt(pow(side, 2) - pow(side / 2, 2));
+		}
+		double get_area()const override
+		{
+			return side * get_height() / 2;
+		}
+		double get_perimeter()const override
+		{
+			return side * 3;
+		}
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			const POINT vertices[] =
+			{
+				{start_x, start_y + get_height()},          //координаты 1 угла
+				{start_x + side, start_y + get_height()},   //координаты 2 угла
+				{start_x + side / 2, start_y}               //координаты 3 угла
+			};
+			::Polygon(hdc, vertices, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			ReleaseDC(hwnd, hdc);
+		}
+	};
 }
+
+
 
 
 void main()
@@ -237,7 +356,13 @@ void main()
 	Geometry:: Square square(50,400,100,5, Geometry:: Color::Yellow);
 	square.info();
 
-	Geometry:: Rectangle rectangle(200,150,550,100,1, Geometry:: Color::Violet);
+	Geometry:: Rectangle rectangle(100,150,150,100,1, Geometry:: Color::Violet);
 	rectangle.info();
+
+	Geometry::Circle circle(50, 300, 200, 1, Geometry::Color::Blue);
+	circle.info();
+
+	Geometry::EquilateralTriangle e_triangle(50, 550, 350, 32, Geometry::Color::Green);
+	e_triangle.info();
 
 }
